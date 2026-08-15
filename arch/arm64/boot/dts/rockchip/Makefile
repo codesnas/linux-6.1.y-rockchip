@@ -289,6 +289,7 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-watermelon-pi-v3.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-yy3568.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-dshapi-r1.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-bananapi-m7.dtb
+dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-bdy-g98.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-blade3-v101-linux.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-blueberry-edge-v10-linux.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-blueberry-edge-v12-linux.dtb
