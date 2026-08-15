@@ -18,6 +18,10 @@
 	model = "RM01";
 	compatible = "rockchip,rk3568-rzw03", "rockchip,rk3568";
 
+	chosen {
+		/delete-property/ bootargs;
+	};
+
     adc_keys: adc-keys {
 		compatible = "adc-keys";
 		io-channels = <&saradc 0>;
