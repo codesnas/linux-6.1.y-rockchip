@@ -640,6 +640,7 @@
 
 	bluetooth {
 		compatible = "brcm,bcm4345c5";
+		status = "disabled";
 		clocks = <&hym8563>;
 		clock-names = "ext_clock";
 		host-wakeup-gpios = <&gpio0 RK_PC5 GPIO_ACTIVE_HIGH>;
