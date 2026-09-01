@@ -93,8 +93,8 @@
 		pwm_led_green: pwm-led-green {
 			color = <LED_COLOR_ID_GREEN>;
 			pwms = <&pwm5 0 1000000 0>;
+			linux,default-trigger = "heartbeat";
 			max-brightness = <255>;
-			default-state = "off";
 		};
 
 		pwm_led_blue: pwm-led-blue {
