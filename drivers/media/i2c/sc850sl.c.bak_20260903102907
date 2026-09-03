@@ -1286,7 +1286,6 @@ static int sc850sl_set_fmt(struct v4l2_subdev *sd,
 		__v4l2_ctrl_modify_range(sc850sl->vblank, vblank_def,
 					 SC850SL_VTS_MAX - mode->height,
 					 1, vblank_def);
-		__v4l2_ctrl_s_ctrl(sc850sl->vblank, vblank_def);
 		__v4l2_ctrl_s_ctrl(sc850sl->link_freq, mode->mipi_freq_idx);
 		pixel_rate = (u32)link_freq_items[mode->mipi_freq_idx] /
 			     mode->bpp * 2 * SC850SL_4LANES;
@@ -1450,7 +1449,6 @@ static int sc850sl_s_frame_interval(struct v4l2_subdev *sd,
 	__v4l2_ctrl_modify_range(sc850sl->vblank, vblank_def,
 				 SC850SL_VTS_MAX - mode->height,
 				 1, vblank_def);
-	__v4l2_ctrl_s_ctrl(sc850sl->vblank, vblank_def);
 	__v4l2_ctrl_s_ctrl(sc850sl->link_freq, mode->mipi_freq_idx);
 	pixel_rate = (u32)link_freq_items[mode->mipi_freq_idx] /
 		     mode->bpp * 2 * SC850SL_4LANES;
@@ -1705,78 +1703,10 @@ static int sc850sl_get_channel_info(struct sc850sl *sc850sl, struct rkmodule_cha
 	return 0;
 }
 
-static int sc850sl_set_setting(struct sc850sl *sc850sl, struct rk_sensor_setting *setting)
-{
-	int i = 0;
-	int cur_fps = 0;
-	s64 h_blank, vblank_def;
-	u64 pixel_rate = 0;
-	const struct sc850sl_mode *mode = NULL;
-	const struct sc850sl_mode *match = NULL;
-
-	dev_info(&sc850sl->client->dev,
-		 "sensor setting: %d x %d, fps:%d fmt:%d, mode:%d\n",
-		 setting->width, setting->height,
-		 setting->fps, setting->fmt, setting->mode);
-
-	for (i = 0; i < sc850sl->cfg_num; i++) {
-		mode = &supported_modes[i];
-		if (mode->width == setting->width &&
-		    mode->height == setting->height &&
-		    mode->hdr_mode == setting->mode &&
-		    mode->bus_fmt == setting->fmt) {
-			cur_fps = DIV_ROUND_CLOSEST(mode->max_fps.denominator,
-						    mode->max_fps.numerator);
-			if (cur_fps == setting->fps) {
-				match = mode;
-				break;
-			}
-		}
-	}
-
-	if (!match) {
-		dev_err(&sc850sl->client->dev,
-			"couldn't match the support modes %dx%d@%d\n",
-			setting->width, setting->height, setting->fps);
-		return -EINVAL;
-	}
-
-	dev_info(&sc850sl->client->dev,
-		 "-----%s: match the support mode, mode idx:%d-----\n",
-		 __func__, i);
-
-	sc850sl->cur_mode = match;
-	mode = sc850sl->cur_mode;
-
-	h_blank = mode->hts_def - mode->width;
-	__v4l2_ctrl_modify_range(sc850sl->hblank, h_blank, h_blank, 1, h_blank);
-	vblank_def = mode->vts_def - mode->height;
-	__v4l2_ctrl_modify_range(sc850sl->vblank, vblank_def,
-				 SC850SL_VTS_MAX - mode->height,
-				 1, vblank_def);
-	__v4l2_ctrl_s_ctrl(sc850sl->vblank, vblank_def);
-
-	__v4l2_ctrl_s_ctrl(sc850sl->link_freq, mode->mipi_freq_idx);
-	pixel_rate = (u32)link_freq_items[mode->mipi_freq_idx] /
-		     mode->bpp * 2 * SC850SL_4LANES;
-	__v4l2_ctrl_s_ctrl_int64(sc850sl->pixel_rate, pixel_rate);
-
-	sc850sl->cur_fps = mode->max_fps;
-	sc850sl->cur_vts = mode->vts_def;
-
-	dev_info(&sc850sl->client->dev,
-		 "hts_def:%d cur_vts:%d cur_fps:%d\n",
-		 mode->hts_def, mode->vts_def,
-		 sc850sl->cur_fps.denominator / sc850sl->cur_fps.numerator);
-
-	return 0;
-}
-
 static long sc850sl_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
 {
 	struct sc850sl *sc850sl = to_sc850sl(sd);
 	struct rkmodule_hdr_cfg *hdr_cfg;
-	struct rk_sensor_setting *setting;
 	const struct sc850sl_mode *mode;
 	struct rkmodule_channel_info *ch_info;
 	long ret = 0;
@@ -1892,11 +1822,6 @@ static long sc850sl_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
 		ret = sc850sl_get_channel_info(sc850sl, ch_info);
 		break;
 
-	case RKCIS_CMD_SELECT_SETTING:
-		setting = (struct rk_sensor_setting *)arg;
-		ret = sc850sl_set_setting(sc850sl, setting);
-		break;
-
 	default:
 		ret = -ENOIOCTLCMD;
 		break;
@@ -1915,7 +1840,6 @@ static long sc850sl_compat_ioctl32(struct v4l2_subdev *sd,
 	struct rkmodule_hdr_cfg *hdr;
 	struct preisp_hdrae_exp_s *hdrae;
 	struct rkmodule_channel_info *ch_info;
-	struct rk_sensor_setting *setting;
 	long ret;
 	u32  stream;
 	u32 brl = 0;
@@ -2000,20 +1924,6 @@ static long sc850sl_compat_ioctl32(struct v4l2_subdev *sd,
 		if (copy_from_user(&stream, up, sizeof(u32)))
 			return -EFAULT;
 		ret = sc850sl_ioctl(sd, cmd, &stream);
-		break;
-	case RKCIS_CMD_SELECT_SETTING:
-		setting = kzalloc(sizeof(*setting), GFP_KERNEL);
-		if (!setting) {
-			ret = -ENOMEM;
-			return ret;
-		}
-
-		if (copy_from_user(setting, up, sizeof(*setting))) {
-			kfree(setting);
-			return -EFAULT;
-		}
-		ret = sc850sl_ioctl(sd, cmd, setting);
-		kfree(setting);
 		break;
 	case RKMODULE_GET_SONY_BRL:
 		ret = sc850sl_ioctl(sd, cmd, &brl);
