@@ -310,18 +310,16 @@
 				data-lanes = <1 2 3 4>;
 			};
 
-			/*
 			csi2_dphy0_in7: endpoint@7 {
 				reg = <7>;
-				remote-endpoint = <&imx586_0_out>;
+				remote-endpoint = <&sc850sl_0_out>;
 				data-lanes = <1 2 3 4>;
 			};
-			*/
 
 			/*
 			csi2_dphy0_in8: endpoint@8 {
 				reg = <8>;
-				remote-endpoint = <&sc850sl_0_out>;
+				remote-endpoint = <&imx586_0_out>;
 				data-lanes = <1 2 3 4>;
 			};
 			*/
@@ -791,6 +789,29 @@
 		};
 	};
 
+	sc850sl_0: sc850sl-0@30 {
+		compatible = "smartsens,sc850sl";
+		reg = <0x30>;
+		clocks = <&cru CLK_MIPI0_OUT2IO>;
+		clock-names = "xvclk";
+		reset-gpios = <&gpio4 RK_PA0 GPIO_ACTIVE_LOW>;
+		pwdn-gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&cam_clk0_pins>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "xiaoyu";
+		rockchip,camera-module-lens-name = "50ipc";
+		status = "okay";
+
+		port {
+			sc850sl_0_out: endpoint {
+				remote-endpoint = <&csi2_dphy0_in7>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+	};
+
 	/*
 	imx586_0: imx586-0@1a {
 		compatible = "sony,imx586";
@@ -809,31 +830,6 @@
 
 		port {
 			imx586_0_out: endpoint {
-				remote-endpoint = <&csi2_dphy0_in7>;
-				data-lanes = <1 2 3 4>;
-			};
-		};
-	};
-	*/
-
-	/*
-	sc850sl_0: sc850sl-0@30 {
-		compatible = "smartsens,sc850sl";
-		reg = <0x30>;
-		clocks = <&cru CLK_MIPI0_OUT2IO>;
-		clock-names = "xvclk";
-		reset-gpios = <&gpio4 RK_PA0 GPIO_ACTIVE_HIGH>;
-		pwdn-gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&cam_clk0_pins>;
-		rockchip,camera-module-index = <0>;
-		rockchip,camera-module-facing = "back";
-		rockchip,camera-module-name = "xiaoyu";
-		rockchip,camera-module-lens-name = "50ipc";
-		status = "okay";
-
-		port {
-			sc850sl_0_out: endpoint {
 				remote-endpoint = <&csi2_dphy0_in8>;
 				data-lanes = <1 2 3 4>;
 			};
