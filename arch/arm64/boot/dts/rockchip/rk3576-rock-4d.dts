@@ -885,6 +885,7 @@
 		//pwdn-gpios = <&gpio3 RK_PC5 GPIO_ACTIVE_HIGH>; // for cam1
 		reset-gpios = <&gpio3 RK_PC7 GPIO_ACTIVE_LOW>;
 
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <0>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "RADXA-CAMERA-4K";
