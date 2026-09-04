@@ -114,6 +114,7 @@
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -137,6 +138,7 @@
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -160,6 +162,7 @@
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -183,6 +186,7 @@
 		power-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -206,6 +210,7 @@
 		reset-gpios = <&gpio4 RK_PA2 GPIO_ACTIVE_HIGH>;
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -229,6 +234,7 @@
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -252,6 +258,7 @@
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -276,6 +283,7 @@
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
@@ -301,6 +309,7 @@
 		pwdn-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&cam_clk1_pins>;
+		rockchip,camera-hdr-mode = <5>; //HDR_X2
 		rockchip,camera-module-index = <1>;
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "xiaoyu";
