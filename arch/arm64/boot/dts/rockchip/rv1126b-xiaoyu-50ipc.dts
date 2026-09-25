@@ -316,6 +316,12 @@
 				data-lanes = <1 2 3 4>;
 			};
 
+			csi2_dphy0_in8: endpoint@8 {
+				reg = <8>;
+				remote-endpoint = <&sc465sl_0_out>;
+				data-lanes = <1 2>;
+			};
+
 			/*
 			csi2_dphy0_in8: endpoint@8 {
 				reg = <8>;
@@ -815,6 +821,30 @@
 			sc850sl_0_out: endpoint {
 				remote-endpoint = <&csi2_dphy0_in7>;
 				data-lanes = <1 2 3 4>;
+			};
+		};
+	};
+
+	sc465sl_0: sc465sl-0@30 {
+		compatible = "smartsens,sc465sl";
+		reg = <0x30>;
+		clocks = <&cru CLK_MIPI0_OUT2IO>;
+		clock-names = "xvclk";
+		reset-gpios = <&gpio4 RK_PA0 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&cam_clk0_pins>;
+		rockchip,camera-hdr-mode = <5>; // HDR_X2
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "xiaoyu";
+		rockchip,camera-module-lens-name = "50ipc";
+		status = "okay";
+
+		port {
+			sc465sl_0_out: endpoint {
+				remote-endpoint = <&csi2_dphy0_in8>;
+				data-lanes = <1 2>;
 			};
 		};
 	};
