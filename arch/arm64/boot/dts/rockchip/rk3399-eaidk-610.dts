@@ -266,6 +266,23 @@
 	cpu-supply = <&vdd_cpu_b>;
 };
 
+/*
+ * The vendor dw-hdmi driver fails to bind (-ENODEV, "can't find route")
+ * without a route-hdmi node; disabled is enough (no U-Boot logo handover).
+ */
+&display_subsystem {
+	route {
+		route_hdmi: route-hdmi {
+			status = "disabled";
+			logo,uboot = "logo.bmp";
+			logo,kernel = "logo_kernel.bmp";
+			logo,mode = "center";
+			charge_logo,mode = "center";
+			connect = <&vopb_out_hdmi>;
+		};
+	};
+};
+
 &emmc_phy {
 	status = "okay";
 };
@@ -296,6 +313,11 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&hdmi_cec>;
 	status = "okay";
+};
+
+/* VOPL is limited to 2560x1600; drive HDMI from VOPB only */
+&hdmi_in_vopl {
+	status = "disabled";
 };
 
 &i2c0 {
@@ -930,7 +952,14 @@
 	dr_mode = "host";
 };
 
+/*
+ * rk3399.dtsi assigns no VOP bus clocks, so aclk_vop*_pre stays on its first
+ * parent, "dummy_vpll", i.e. VPLL, which HDMI retunes as its pixel clock.
+ * The VOP then underflows (POST_BUF_EMPTY storm). gpll/2 = 297MHz is exact.
+ */
 &vopb {
+	assigned-clocks = <&cru ACLK_VOP0>, <&cru HCLK_VOP0>;
+	assigned-clock-rates = <297000000>, <100000000>;
 	status = "okay";
 };
 
@@ -939,6 +968,8 @@
 };
 
 &vopl {
+	assigned-clocks = <&cru ACLK_VOP1>, <&cru HCLK_VOP1>;
+	assigned-clock-rates = <297000000>, <100000000>;
 	status = "okay";
 };
 
