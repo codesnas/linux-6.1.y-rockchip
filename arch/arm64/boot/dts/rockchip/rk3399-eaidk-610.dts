@@ -773,12 +773,13 @@
 	sd-uhs-sdr104;
 	status = "okay";
 
+	/*
+	 * No OOB host-wake interrupt: GPIO0_A3 never carries a usable signal
+	 * on this board, so brcmfmac uses the in-band SDIO interrupt.
+	 */
 	brcmf: wifi@1 {
 		compatible = "brcm,bcm4329-fmac";
 		reg = <1>;
-		interrupt-parent = <&gpio0>;
-		interrupts = <RK_PA3 GPIO_ACTIVE_HIGH>;
-		interrupt-names = "host-wake";
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_host_wake_l>;
 	};
