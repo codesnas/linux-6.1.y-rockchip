@@ -229,7 +229,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&vcc5v0_typec_en>;
 		regulator-name = "vcc5v0_typec";
-		regulator-always-on;
 		vin-supply = <&vcc3v3_sys>;
 	};
 
@@ -588,6 +587,11 @@
 			compatible = "usb-c-connector";
 			data-role = "dual";
 			label = "USB-C";
+			op-sink-microwatt = <2500000>;
+			power-role = "dual";
+			sink-pdos = <PDO_FIXED(5000, 500, PDO_FIXED_USB_COMM)>;
+			source-pdos = <PDO_FIXED(5000, 900, PDO_FIXED_USB_COMM)>;
+			try-power-role = "source";
 
 			ports {
 				#address-cells = <1>;
@@ -605,7 +609,7 @@
 					reg = <1>;
 
 					usbc_ss: endpoint {
-						remote-endpoint = <&tcphy0_typec_ss>;
+						remote-endpoint = <&tcphy0_orien_sw>;
 					};
 				};
 			};
@@ -798,14 +802,17 @@
 	status = "okay";
 };
 
+/*
+ * The vendor phy-rockchip-typec driver registers its orientation switch only
+ * when "orientation-switch" is on the PHY node itself, using that node's
+ * fwnode, so the connector's SuperSpeed endpoint must link to this node.
+ */
 &tcphy0 {
-	status = "okay";
-};
-
-&tcphy0_usb3 {
 	orientation-switch;
+	status = "okay";
+
 	port {
-		tcphy0_typec_ss: endpoint {
+		tcphy0_orien_sw: endpoint {
 			remote-endpoint = <&usbc_ss>;
 		};
 	};
