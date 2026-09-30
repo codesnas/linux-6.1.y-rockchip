@@ -139,7 +139,7 @@
 			"Microphone", "Mic Jack",
 			"Headphone", "Headphone Jack";
 		simple-audio-card,routing =
-			"Mic Jack", "MICBIAS1",
+			"Mic Jack", "micbias1",
 			"IN1P", "Mic Jack",
 			"Headphone Jack", "HPOL",
 			"Headphone Jack", "HPOR";
@@ -318,6 +318,10 @@
 /* VOPL is limited to 2560x1600; drive HDMI from VOPB only */
 &hdmi_in_vopl {
 	status = "disabled";
+};
+
+&hdmi_sound {
+	status = "okay";
 };
 
 &i2c0 {
@@ -566,6 +570,8 @@
 		reg = <0x1a>;
 		clocks = <&cru SCLK_I2S_8CH_OUT>;
 		clock-names = "mclk";
+		pinctrl-names = "default";
+		pinctrl-0 = <&i2s_8ch_mclk>;
 		hp-det-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_LOW>;
 		spk-con-gpio = <&gpio0 RK_PB3 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
