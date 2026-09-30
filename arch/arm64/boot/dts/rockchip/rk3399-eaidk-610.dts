@@ -139,7 +139,7 @@
 			"Microphone", "Mic Jack",
 			"Headphone", "Headphone Jack";
 		simple-audio-card,routing =
-			"Mic Jack", "MICBIAS1",
+			"Mic Jack", "micbias1",
 			"IN1P", "Mic Jack",
 			"Headphone Jack", "HPOL",
 			"Headphone Jack", "HPOR";
@@ -229,7 +229,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&vcc5v0_typec_en>;
 		regulator-name = "vcc5v0_typec";
-		regulator-always-on;
 		vin-supply = <&vcc3v3_sys>;
 	};
 
@@ -267,6 +266,23 @@
 	cpu-supply = <&vdd_cpu_b>;
 };
 
+/*
+ * The vendor dw-hdmi driver fails to bind (-ENODEV, "can't find route")
+ * without a route-hdmi node; disabled is enough (no U-Boot logo handover).
+ */
+&display_subsystem {
+	route {
+		route_hdmi: route-hdmi {
+			status = "disabled";
+			logo,uboot = "logo.bmp";
+			logo,kernel = "logo_kernel.bmp";
+			logo,mode = "center";
+			charge_logo,mode = "center";
+			connect = <&vopb_out_hdmi>;
+		};
+	};
+};
+
 &emmc_phy {
 	status = "okay";
 };
@@ -296,6 +312,15 @@
 	ddc-i2c-bus = <&i2c3>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&hdmi_cec>;
+	status = "okay";
+};
+
+/* VOPL is limited to 2560x1600; drive HDMI from VOPB only */
+&hdmi_in_vopl {
+	status = "disabled";
+};
+
+&hdmi_sound {
 	status = "okay";
 };
 
@@ -545,6 +570,8 @@
 		reg = <0x1a>;
 		clocks = <&cru SCLK_I2S_8CH_OUT>;
 		clock-names = "mclk";
+		pinctrl-names = "default";
+		pinctrl-0 = <&i2s_8ch_mclk>;
 		hp-det-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_LOW>;
 		spk-con-gpio = <&gpio0 RK_PB3 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
@@ -588,6 +615,11 @@
 			compatible = "usb-c-connector";
 			data-role = "dual";
 			label = "USB-C";
+			op-sink-microwatt = <2500000>;
+			power-role = "dual";
+			sink-pdos = <PDO_FIXED(5000, 500, PDO_FIXED_USB_COMM)>;
+			source-pdos = <PDO_FIXED(5000, 900, PDO_FIXED_USB_COMM)>;
+			try-power-role = "source";
 
 			ports {
 				#address-cells = <1>;
@@ -605,7 +637,7 @@
 					reg = <1>;
 
 					usbc_ss: endpoint {
-						remote-endpoint = <&tcphy0_typec_ss>;
+						remote-endpoint = <&tcphy0_orien_sw>;
 					};
 				};
 			};
@@ -769,12 +801,13 @@
 	sd-uhs-sdr104;
 	status = "okay";
 
+	/*
+	 * No OOB host-wake interrupt: GPIO0_A3 never carries a usable signal
+	 * on this board, so brcmfmac uses the in-band SDIO interrupt.
+	 */
 	brcmf: wifi@1 {
 		compatible = "brcm,bcm4329-fmac";
 		reg = <1>;
-		interrupt-parent = <&gpio0>;
-		interrupts = <RK_PA3 GPIO_ACTIVE_HIGH>;
-		interrupt-names = "host-wake";
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_host_wake_l>;
 	};
@@ -798,14 +831,17 @@
 	status = "okay";
 };
 
+/*
+ * The vendor phy-rockchip-typec driver registers its orientation switch only
+ * when "orientation-switch" is on the PHY node itself, using that node's
+ * fwnode, so the connector's SuperSpeed endpoint must link to this node.
+ */
 &tcphy0 {
-	status = "okay";
-};
-
-&tcphy0_usb3 {
 	orientation-switch;
+	status = "okay";
+
 	port {
-		tcphy0_typec_ss: endpoint {
+		tcphy0_orien_sw: endpoint {
 			remote-endpoint = <&usbc_ss>;
 		};
 	};
@@ -922,7 +958,14 @@
 	dr_mode = "host";
 };
 
+/*
+ * rk3399.dtsi assigns no VOP bus clocks, so aclk_vop*_pre stays on its first
+ * parent, "dummy_vpll", i.e. VPLL, which HDMI retunes as its pixel clock.
+ * The VOP then underflows (POST_BUF_EMPTY storm). gpll/2 = 297MHz is exact.
+ */
 &vopb {
+	assigned-clocks = <&cru ACLK_VOP0>, <&cru HCLK_VOP0>;
+	assigned-clock-rates = <297000000>, <100000000>;
 	status = "okay";
 };
 
@@ -931,6 +974,8 @@
 };
 
 &vopl {
+	assigned-clocks = <&cru ACLK_VOP1>, <&cru HCLK_VOP1>;
+	assigned-clock-rates = <297000000>, <100000000>;
 	status = "okay";
 };
 
